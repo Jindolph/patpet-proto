@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+	<typeAliases>
+		<typeAlias type="com.goott.pp.member.vo.MemVO"
+			alias="memVO" />
+		<typeAlias type="com.goott.pp.subs.vo.SubsVO"
+			alias="subsVO" />
+		<typeAlias type="com.goott.pp.delivery.vo.DvrVO"
+			alias="dvrVO" />
+		<typeAlias type="com.goott.pp.payment.vo.PmtVO"
+			alias="pmtVO" />
+		<typeAlias type="com.goott.pp.product.vo.PdtVO"
+			alias="pdtVO" />
+		<typeAlias type="com.goott.pp.gift.vo.GiftVO"
+			alias="giftVO" />
+		<typeAlias type="com.goott.pp.common.file.vo.FileVO"
+			alias="fileVO" />
+		<typeAlias type="com.goott.pp.board.vo.AtcVO"
+   alias="atcVO" />
+  <typeAlias type="com.goott.pp.common.paging.PagingDTO" 
+   alias="PagingDTO" />
+  <typeAlias type="com.goott.pp.common.file.vo.TestFileVO" 
+   alias="testfileVO" />
+  <typeAlias type="com.goott.pp.board.vo.CmtVO"
+   alias="cmtVO" />
+	</typeAliases>
+</configuration>

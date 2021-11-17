@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.MemMapper">
+
+	<resultMap type="memVO" id="memResult">
+		<result property="mem_code" column="mem_code" />
+		<result property="mem_id" column="mem_id" />
+		<result property="mem_pw" column="mem_pw" />
+		<result property="mem_name" column="mem_name" />
+		<result property="nickname" column="nickname" />
+		<result property="birthdate" column="birthDate" />
+		<result property="joinDate" column="joinDate" />
+		<result property="points" column="points" />
+		<result property="email_YN" column="email_YN" />
+		<result property="is_subs" column="is_subs" />
+		<result property="is_left" column="is_left" />
+		<result property="leftDate" column="leftDate" />
+	</resultMap>
+	
+	 <resultMap type="subsVO" id="subsResult">
+  <result property="subs_code" column="subs_code" />
+  <result property="subs_grade" column="subs_grade" />
+  <result property="beginDate" column="beginDate" />
+  <result property="endDate" column="endDate" />
+  <result property="client_id" column="client_id" />
+  <result property="is_canceled" column="is_canceled" />
+ </resultMap>
+
+	<select id="selectMemberByInfo" resultMap="memResult"
+		parameterType="java.util.Map">
+	    <![CDATA[
+			SELECT * FROM PP_MEMBERS
+			WHERE mem_id=#{mem_id} AND mem_pw=#{mem_pw}
+		]]>
+	</select>
+
+ <insert id="insertNewMember" parameterType="java.util.Map">
+        <![CDATA[
+   INSERT INTO PP_MEMBERS
+      ( mem_code, mem_id, mem_pw, mem_name, birthdate,
+          joinDate, points, email_yn, is_subs )
+   VALUES
+   ( MEM_SEQ.nextval, #{mem_id}, #{mem_pw}, #{mem_name}, #{birthdate},
+        DEFAULT, DEFAULT, #{email_yn}, DEFAULT)
+        ]]>
+ </insert>
+ 
+	<select id="selectCheckOverlappedId" parameterType="String"
+		resultType="int">
+        <![CDATA[
+			SELECT COUNT(*)
+			FROM PP_MEMBERS
+			WHERE mem_id=#{id}
+		]]>
+	</select>
+	
+	<update id="updateMemberPw" parameterType="java.util.Map">
+	<![CDATA[
+	 UPDATE pp_members
+	 SET mem_pw=#{pw}
+	 WHERE mem_id=#{id}
+	]]>
+	</update>
+	
+	<update id="updateMemberEmail" parameterType="java.util.Map">
+  <![CDATA[
+   UPDATE PP_MEMBERS
+   SET email_YN = #{eck}
+   WHERE mem_id=#{id}
+        ]]>
+ </update>
+
+	<update id="updateMemberDropYN" parameterType="String">
+		<![CDATA[
+			UPDATE PP_MEMBERS
+			SET is_left = 'Y'
+			WHERE mem_id=#{mem_id}
+        ]]>
+	</update>
+	<update id="updateisSubs" parameterType="java.util.Map">
+	<![CDATA[
+	  UPDATE PP_MEMBERS
+	  SET is_subs = 'Y'
+	  WHERE mem_id=#{mem_id}
+	]]>
+	
+	</update>
+	 <update id="updateisSubsn" parameterType="java.util.Map">
+ <![CDATA[
+   UPDATE PP_MEMBERS
+   SET is_subs = 'N'
+   WHERE mem_id=#{mem_id}
+ ]]>
+ </update>
+	<select id="selectFindId" parameterType="java.util.Map" resultType="String">
+	 <![CDATA[
+	  SELECT mem_id
+   FROM PP_MEMBERS
+   WHERE mem_name=#{name} AND birthdate=#{date}
+	 ]]>
+	</select>
+	
+	 <select id="selectFindPw" parameterType="java.util.Map" resultType="String">
+  <![CDATA[
+   SELECT mem_pw
+   FROM PP_MEMBERS
+   WHERE mem_name=#{name} AND birthdate=#{date} AND mem_id=#{id}
+  ]]>
+ </select>
+ 
+  <select id="selectMyInfo" resultMap="memResult"
+  parameterType="String">
+     <![CDATA[
+   SELECT * FROM PP_MEMBERS
+   WHERE mem_id=#{mem_id}
+  ]]>
+ </select>
+ 
+	
+</mapper>

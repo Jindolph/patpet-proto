@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.FileMapper">
+	<resultMap type="fileVO" id="fileResult">
+		<result property="file_code" column="file_code" />
+		<result property="content_id" column="content_id" />
+		<result property="orgn_name" column="orgn_name" />
+		<result property="fileSize" column="fileSize" />
+		<result property="new_name" column="new_name" />
+		<result property="data_path" column="data_path" />
+	</resultMap>
+
+	<select id="selectFileSeq" resultType="int">
+		<![CDATA[
+			SELECT FILE_SEQ.NEXTVAL FROM DUAL
+		]]>
+	</select>
+
+	<select id="selectAllFileList" resultMap="fileResult">
+	  <![CDATA[
+			SELECT * FROM PP_FILES
+		]]>
+	</select>
+
+	<select id="selectAllFilesFromDataPath" resultMap="fileResult">
+	  <![CDATA[
+			SELECT * FROM PP_FILES
+			WHERE data_path=#{data_path}
+		]]>
+	</select>
+
+	<select id="selectFileInfo" resultMap="fileResult">
+	  <![CDATA[
+			SELECT * FROM PP_FILES
+			WHERE new_name=#{fileName}
+		]]>
+	</select>
+
+	<select id="selectSavedFile" resultType="int">
+	  <![CDATA[
+			SELECT COUNT(*) FROM PP_FILES
+			WHERE orgn_name=#{orgn_name} AND fileSize=#{fileSize}
+		]]>
+	</select>
+
+	<insert id="insertNewFile" parameterType="fileVO">
+		<![CDATA[
+			INSERT INTO PP_FILES
+			(file_code, content_id, orgn_name, fileSize, new_name, data_path)
+			VALUES
+			(#{file_code}, #{content_id}, #{orgn_name}, #{fileSize}, #{new_name}, #{data_path})
+		]]>
+	</insert>
+
+	<delete id="deleteFile" parameterType="fileVO">
+		<![CDATA[
+			DELETE PP_FILES WHERE data_path=#{data_path} AND new_name=#{new_name}
+		]]>
+	</delete>
+
+</mapper>

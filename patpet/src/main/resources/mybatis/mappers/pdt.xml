@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.PdtMapper">
+	<resultMap type="pdtVO" id="pdtResult">
+		<result property="pdt_code" column="pdt_code" />
+		<result property="pdt_type" column="pdt_type" />
+		<result property="pdt_name" column="pdt_name" />
+		<result property="regDate" column="regDate" />
+	</resultMap>
+	
+	<select id="selectSubsProductSeq" resultType="int">
+		<![CDATA[
+			SELECT PDT_SEQ.NEXTVAL FROM DUAL
+		]]>
+	</select>
+
+	<select id="selectRdProductSeq" resultType="int">
+		<![CDATA[
+			SELECT RD_PDT_SEQ.NEXTVAL FROM DUAL
+		]]>
+	</select>
+
+	<select id="selectAllProducts" resultMap="pdtResult">
+	  <![CDATA[
+			SELECT * FROM PP_PRODUCTS
+		]]>
+	</select>
+
+	<select id="selectAllSubsProducts" resultMap="pdtResult">
+	    <![CDATA[
+			SELECT * FROM PP_PRODUCTS
+			WHERE pdt_code<5001
+		]]>
+	</select>
+
+	<select id="selectAllRdProducts" resultMap="pdtResult">
+	    <![CDATA[
+			SELECT * FROM PP_PRODUCTS
+			WHERE pdt_code>5000
+		]]>
+	</select>
+
+	<select id="selectProductByCode" resultMap="pdtResult">
+	    <![CDATA[
+			SELECT * FROM PP_PRODUCTS
+			WHERE pdt_code=#{code}
+		]]>
+	</select>
+
+	<insert id="insertNewSubsProduct" parameterType="pdtVO">
+		<![CDATA[
+			INSERT INTO PP_PRODUCTS
+			(pdt_code, pdt_type, pdt_name)
+			VALUES
+			(#{pdt_code}, #{pdt_type}, #{pdt_name})
+		]]>
+	</insert>
+
+	<insert id="insertNewRdProduct" parameterType="pdtVO">
+		<![CDATA[
+			INSERT INTO PP_PRODUCTS
+			(pdt_code, pdt_type, pdt_name)
+			VALUES
+			(#{pdt_code}, #{pdt_type}, #{pdt_name})
+		]]>
+	</insert>
+	
+	<update id="updatePdt" parameterType="pdtVO">
+		<![CDATA[
+			UPDATE PP_PRODUCTS
+			SET
+			pdt_type=#{pdt_type}, pdt_name=#{pdt_name}
+			WHERE
+			pdt_code=#{pdt_code}
+		]]>
+	</update>
+	
+	<delete id="deletePdt">
+		<![CDATA[
+			DELETE PP_PRODUCTS
+			WHERE
+			pdt_code=#{pdt_code}
+		]]>
+	</delete>
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.PmtMapper">
+	<resultMap type="pmtVO" id="pmtResult">
+		<result property="pay_code" column="pay_code" />
+		<result property="mem_id" column="mem_id" />
+		<result property="subs_code" column="subs_code" />
+		<result property="pmt_card" column="pmt_card" />
+  <result property="pmt_cnum" column="pmt_cnum" />
+		<result property="pmt_date" column="pmt_date" />
+		  <result property="pmt_type" column="pmt_type" />
+	</resultMap>
+	
+ <select id="selectPmtById" resultMap="pmtResult" parameterType="String">
+     <![CDATA[
+   SELECT * FROM PP_PAYMENTS
+   WHERE mem_id=#{id}
+   ORDER BY pmt_type desc
+  ]]>
+ </select>
+ 
+  <insert id="insertPmtById" parameterType="java.util.Map">
+        <![CDATA[
+   INSERT INTO PP_PAYMENTS
+      ( pay_code, mem_id, pmt_card, pmt_cnum, pmt_type)
+   VALUES
+   ( PMT_SEQ.nextval, #{mem_id}, #{pmt_card}, #{pmt_cnum}, #{pmt_type})
+        ]]>
+ </insert>
+ 
+   <update id="updatePmtType" parameterType="java.util.Map">
+  <![CDATA[
+   UPDATE PP_PAYMENTS
+   SET pmt_type='N'
+   WHERE mem_id=#{mem_id}
+   ]]>
+ </update>
+ 
+  <update id="updatePmtInfo" parameterType="java.util.Map">
+  <![CDATA[
+   UPDATE PP_PAYMENTS
+   SET 
+   pmt_card=#{pmt_card}, pmt_cnum=#{pmt_cnum}, mem_id=#{mem_id}, pmt_type=#{pmt_type}
+   WHERE pay_code=#{pay_code}
+        ]]>
+ </update>
+
+ <delete id="deletePmtInfo" parameterType="String">
+  <![CDATA[
+   DELETE PP_PAYMENTS
+   WHERE pay_code=#{pay_code}
+  ]]>
+ </delete>
+</mapper>

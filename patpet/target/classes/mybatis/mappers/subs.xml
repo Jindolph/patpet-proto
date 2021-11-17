@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.SubsMapper">
+
+	<resultMap type="subsVO" id="subsResult">
+		<result property="subs_code" column="subs_code" />
+		<result property="subs_grade" column="subs_grade" />
+		<result property="beginDate" column="beginDate" />
+		<result property="endDate" column="endDate" />
+		<result property="client_id" column="client_id" />
+		<result property="is_canceled" column="is_canceled" />
+	</resultMap>
+
+	<select id="selectAllSubs" resultMap="subsResult">
+	  <![CDATA[
+			SELECT * FROM PP_SUBS
+		]]>
+	</select>
+
+	<select id="selectAllSubsById" parameterType="String"
+		resultMap="subsResult">
+	  <![CDATA[
+			SELECT * FROM PP_SUBS
+			WHERE client_id=#{id}
+		]]>
+	</select>
+
+	<select id="selectSubsInfoById" resultMap="subsResult"
+		parameterType="String">
+	  <![CDATA[
+			SELECT * FROM PP_SUBS
+			WHERE 
+				(is_canceled='N') 
+				AND 
+				(enddate > SYSDATE) 
+				AND 
+				client_id=#{id}
+		]]>
+	</select>
+
+	<select id="selectCheckIdAvailable" resultType="String"
+		parameterType="String">
+		<![CDATA[
+			SELECT subs_grade FROM PP_SUBS
+			WHERE 
+				(is_canceled='N') 
+				AND 
+				(enddate > SYSDATE) 
+				AND 
+				client_id=#{id}
+		]]>
+	</select>
+
+	<insert id="insertNewSubs" parameterType="java.util.Map">
+    <![CDATA[
+			INSERT INTO PP_SUBS
+    		( subs_code, subs_grade, beginDate, 
+    		  endDate, client_id, is_canceled )
+			VALUES
+		    ( SUBS_SEQ.nextval, #{grade}, SYSDATE, 
+			  ADD_MONTHS(SYSDATE, #{months}),
+		      #{mem_id}, DEFAULT )
+    ]]>
+	</insert>
+
+	<update id="updateSubsProlonged" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE PP_SUBS
+			SET 
+			endDate=ADD_MONTHS(endDate, #{months})
+			WHERE subs_code=#{subs_code}
+    ]]>
+	</update>
+
+	<update id="updateSubsGrade" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE PP_SUBS
+			SET 
+			subs_grade=#{grade}
+			WHERE subs_code=#{subs_code}
+    ]]>
+	</update>
+
+	<update id="updateSubsCancel" parameterType="int">
+		<![CDATA[
+			UPDATE PP_SUBS
+			SET is_canceled = 'Y', endDate=SYSDATE
+			WHERE subs_code=#{subs_code}
+    ]]>
+	</update>
+</mapper>

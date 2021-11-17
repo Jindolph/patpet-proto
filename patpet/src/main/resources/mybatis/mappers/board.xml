@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.BoardMapper">
+	<resultMap type="atcVO" id="atcResult">
+		<result property="atc_no" column="atc_no" />
+		<result property="title" column="title" />
+		<result property="txt_content" column="txt_content" />
+		<result property="regDate" column="regDate" />
+		<result property="modDate" column="modDate" />
+		<result property="is_secret" column="is_secret" />
+		<result property="atc_type" column="atc_type" />
+		<result property="writer" column="writer" />
+		<result property="hearts" column="hearts" />
+		<result property="hits" column="hits" />
+		<result property="product" column="product" />
+	</resultMap>
+
+	<resultMap type="cmtVO" id="cmtResult">
+		<result property="cmt_no" column="cmt_no" />
+		<result property="parent_atc" column="parent_atc" />
+		<result property="txt_content" column="txt_content" />
+		<result property="regDate" column="regDate" />
+		<result property="modDate" column="modDate" />
+		<result property="writer" column="writer" />
+		<result property="product" column="product" />
+	</resultMap>
+	
+ <resultMap type="memVO" id="memResult">
+  <result property="mem_code" column="mem_code" />
+  <result property="mem_id" column="mem_id" />
+  <result property="mem_pw" column="mem_pw" />
+  <result property="mem_name" column="mem_name" />
+  <result property="nickname" column="nickname" />
+  <result property="birthdate" column="birthDate" />
+  <result property="joinDate" column="joinDate" />
+  <result property="points" column="points" />
+  <result property="email_YN" column="email_YN" />
+  <result property="is_subs" column="is_subs" />
+  <result property="is_left" column="is_left" />
+  <result property="leftDate" column="leftDate" />
+ </resultMap>	
+	
+	<select id="selectArticleSeq" resultType="int">
+	<![CDATA[
+		SELECT ATC_SEQ.NEXTVAL FROM DUAL
+	]]>
+	</select>
+	
+	<select id="selectCountArticles" resultType="int" parameterType="String">
+	<![CDATA[
+		SELECT COUNT(atc_no) 
+		FROM PP_ARTICLES
+		WHERE atc_type=#{atc_type}
+	]]>
+	</select>
+	
+	<select id="selectPagingArticles" resultMap="atcResult" parameterType="java.util.Map">
+	<![CDATA[
+		SELECT *
+		FROM ( SELECT rownum r, a.*
+		       FROM ( SELECT * 
+				      		FROM PP_ARTICLES
+				      		WHERE atc_type=#{type}
+				      		ORDER BY atc_no DESC ) a
+		       WHERE rownum <= #{page}*10)
+		WHERE r >= (10*#{page})-(10-1)
+	]]>
+	</select>
+	
+	<select id="selectMyQnAList" resultMap="atcResult">
+	<![CDATA[
+		SELECT * FROM PP_ARTICLES
+		WHERE atc_type='QNA' AND writer=#{id}
+	]]>
+	</select>
+	
+	<select id="selectArticle" parameterType="int" resultMap="atcResult">
+	<![CDATA[
+		SELECT * FROM PP_ARTICLES
+		WHERE atc_no = #{atc_no}
+	]]>
+	</select>
+	
+	 <select id="selectArticle2" parameterType="java.util.Map" resultMap="atcResult">
+ <![CDATA[
+  SELECT * FROM PP_ARTICLES
+  WHERE writer = #{memId} AND atc_type =#{type}
+ ]]>
+ </select>
+	
+<insert id="insertNewArticle" parameterType="atcVO">
+		INSERT INTO 
+		PP_ARTICLES
+		<if test="product==null">
+		(atc_no,title,txt_content,
+		 writer,atc_type)
+		VALUES
+		(#{atc_no},#{title},#{txt_content}, 
+		 #{writer},#{atc_type})
+		</if>
+		<if test="product!=null">
+		(atc_no,title,txt_content,
+		 writer,atc_type,product)
+		VALUES
+		(#{atc_no},#{title},#{txt_content}, 
+		 #{writer},#{atc_type},#{product})
+		</if>
+	</insert>
+	
+	<insert id="insertNewArticle2" parameterType="atcVO">
+	<![CDATA[
+		INSERT INTO 
+		PP_ARTICLES
+		(atc_no,title,txt_content,
+		 writer,atc_type)
+		VALUES
+		(ATC_SEQ.NEXTVAL,'방명록','반갑습니다', 
+		 #{mem_id},'BOOK')
+	]]>
+	</insert>
+	
+
+	<update id="updateArticle" parameterType="atcVO">
+	<![CDATA[
+		UPDATE PP_ARTICLES
+		SET title = #{title}, txt_content = #{txt_content}, modDate = SYSDATE
+		WHERE atc_no = #{atc_no}
+	]]>
+	</update>
+	
+	 <update id="updateArticle2" parameterType="java.util.Map">
+ <![CDATA[
+  UPDATE PP_ARTICLES
+  SET txt_content = #{txt_content}, modDate = SYSDATE
+  WHERE atc_no = #{atc_no}
+ ]]>
+ </update>
+	
+	<update id="updateHitsUp" parameterType="int" >
+	<![CDATA[
+		UPDATE PP_ARTICLES 
+		SET
+		hits = hits + 1
+		WHERE atc_no = #{atc_no}
+	]]>
+	</update>
+	
+	<update id="updateHeartsUP" parameterType="int">
+	<![CDATA[
+		UPDATE PP_ARTICLES
+		SET 
+		hearts = hearts + 1
+		WHERE atc_no = #{atc_no}
+	]]>
+	</update>
+	
+	<update id="updateHeartsDOWN" parameterType="int">
+	<![CDATA[
+		UPDATE PP_ARTICLES
+		SET 
+		hearts = hearts - 1
+		WHERE atc_no = #{atc_no}
+	]]>
+	</update>
+	
+	<update id="updateGiftCodeFromArticle" parameterType="java.util.Map">
+	<![CDATA[
+		UPDATE PP_ARTICLES
+		SET 
+		product = #{gift_code}, title = '교환완료'
+		WHERE writer = #{owner_id} AND atc_no = #{no}
+	]]>
+	</update>
+
+	<delete id="deleteArticle" parameterType="int">
+	<![CDATA[
+		DELETE FROM PP_ARTICLES
+		WHERE atc_no = #{atc_no}
+	]]>
+	</delete>
+	
+	<!-- 댓글시작####################################################### -->
+	
+	<select id="selectComments" parameterType="java.util.Map" resultMap="cmtResult" >
+	<![CDATA[
+		SELECT *
+		FROM ( SELECT rownum r, a.*
+	   			 FROM ( SELECT * 
+              		FROM PP_COMMENTS
+              		WHERE parent_atc = #{atc_no}
+              		ORDER BY cmt_no DESC ) a
+    			 WHERE rownum <= #{page}*10)
+		WHERE r >= (10*#{page})-(10-1)
+	]]>
+	</select>
+	
+	<select id="selectComments2" parameterType="int" resultMap="cmtResult" >
+  <![CDATA[
+  	SELECT *
+  	FROM PP_COMMENTS
+  	WHERE parent_atc = #{atcNO}
+  ]]>
+  </select>
+	
+	<select id="selectCountComments" resultType="int">
+	<![CDATA[
+  	SELECT COUNT(*) FROM PP_COMMENTS
+  	WHERE parent_atc = #{atc_no}
+  ]]>
+	</select>
+	
+	<insert id="insertComment" parameterType="java.util.Map">
+		INSERT INTO 
+		PP_COMMENTS
+		<if test="product==null">
+		(cmt_no,parent_atc,txt_content,writer)
+		VALUES
+		(CMT_SEQ.NEXTVAL,#{parent_atc},#{txt_content},#{writer})
+		</if>
+		<if test="product!=null">
+		(cmt_no,parent_atc,txt_content,writer,product)
+		VALUES
+		(CMT_SEQ.NEXTVAL,#{parent_atc},#{txt_content},#{writer},#{product})
+		</if>
+	</insert>
+	
+	<insert id="insertComment2" parameterType="java.util.Map">
+ <![CDATA[
+  INSERT INTO PP_COMMENTS
+  (cmt_no,parent_atc,txt_content,writer)
+  VALUES
+  (CMT_SEQ.NEXTVAL,#{atc_no},#{txt_content},#{writer})
+ ]]>
+ </insert>
+	
+	<update id="updateComment" parameterType="java.util.Map">
+	<![CDATA[
+		UPDATE PP_COMMENTS
+		SET 
+		txt_content=#{txt_content}, modDate=SYSDATE
+		WHERE cmt_no=#{cmt_no}
+	]]>
+	</update>
+	
+	<update id="updateGiftCodeFromComment" parameterType="java.util.Map">
+	<![CDATA[
+		UPDATE PP_COMMENTS
+		SET 
+		product = #{gift_code}
+		WHERE writer = #{owner_id} AND cmt_no=#{no}
+	]]>
+	</update>
+	
+	<delete id="deleteComment" parameterType="int">
+	<![CDATA[
+		DELETE PP_COMMENTS
+		WHERE cmt_no = #{cmt_no}
+	]]>
+	</delete>
+ 
+ 	<!-- 좋아요시작####################################################### -->
+ 
+	<select id="heartLogs" parameterType="java.util.Map" resultType="int">
+	<![CDATA[
+		SELECT COUNT(*) FROM PP_HEARTLOGS
+		WHERE ano=#{atcNO} AND mid=#{memId}
+	]]>
+	</select>
+
+	<insert id="heartNewLogs" parameterType="java.util.Map">
+	<![CDATA[
+		INSERT INTO PP_HEARTLOGS(ano, mid)
+		VALUES(#{atcNO}, #{memId})
+	]]>
+	</insert>
+	
+	<delete id="heartDelLogs" parameterType="java.util.Map">
+		<![CDATA[
+			DELETE FROM PP_HEARTLOGS
+			WHERE ano = #{atcNO} AND mid = #{memId}
+		]]>
+	</delete>
+	
+	<!-- 좋아요시작####################################################### -->
+	
+	<select id="reportLogs" parameterType="java.util.Map" resultType="int">
+	<![CDATA[
+		SELECT COUNT(*) FROM PP_REPORTLOGS
+		WHERE ano=#{atcNO} AND mid=#{memId}
+	]]>
+	</select>
+	
+	<insert id="reportNewLogs" parameterType="java.util.Map">
+	<![CDATA[
+		INSERT INTO PP_REPORTLOGS(ano, mid)
+		VALUES(#{atcNO}, #{memId})
+	]]>
+	</insert>
+	
+	
+
+
+ 
+ <!-- Q&A 게시판 개수 -->
+ <select id="selectCountBoards" resultType="int" parameterType="String">
+ <![CDATA[
+  SELECT COUNT(atc_no) 
+  FROM PP_ARTICLES
+  WHERE atc_type=#{atc_type}
+ ]]>
+ </select>
+ 
+ <!-- Q&A 게시판 페이징  -->
+ <select id="selectPagingBoards" resultMap="atcResult" parameterType="java.util.Map">
+ <![CDATA[
+  SELECT *
+  FROM ( SELECT rownum r, a.*
+         FROM ( SELECT * 
+            FROM PP_ARTICLES
+            WHERE atc_type=#{type}
+            ORDER BY atc_no DESC ) a
+         WHERE rownum <= #{page}*10)
+  WHERE r >= (10*#{page})-(10-1)
+ ]]>
+ </select>
+ 
+ <!-- Q&A 상세 -->
+ <select id="selectBoard" parameterType="int" resultMap="atcResult">
+ <![CDATA[
+  SELECT * FROM PP_ARTICLES
+  WHERE atc_no = #{atc_no}
+ ]]>
+ </select>
+ 
+ <!-- 게시판 작성 -->
+ <insert id="insertNewBoard" parameterType="atcVO">
+ <![CDATA[
+  INSERT INTO PP_ARTICLES
+  (atc_no, title, txt_content, writer, atc_type, is_secret)
+  VALUES
+  (#{atc_no}, #{title}, #{txt_content}, #{writer}, #{atc_type}, 'Y')
+ ]]> 
+ </insert>
+ 
+ <!-- 게시판 수정 -->
+ <update id="updateBoard" parameterType="atcVO">
+ <![CDATA[
+  UPDATE PP_ARTICLES
+  SET title = #{title}, txt_content = #{txt_content}, modDate = SYSDATE
+  WHERE atc_no = #{atc_no}
+ ]]>
+ 
+ </update>
+ 
+ <!-- Q&A게시글 지우기 -->
+ <delete id="deleteBoard" parameterType="int">
+ <![CDATA[
+  DELETE FROM PP_ARTICLES
+  WHERE atc_no = #{atc_no}
+ ]]>
+ </delete>
+
+</mapper>

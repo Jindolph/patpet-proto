@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.GiftMapper">
+	<resultMap type="giftVO" id="giftResult">
+		<result property="gift_code" column="gift_code" />
+		<result property="owner_id" column="owner_id" />
+		<result property="gift_type" column="gift_type" />
+		<result property="gift_value" column="gift_value" />
+		<result property="is_opened" column="is_opened" />
+		<result property="regDate" column="regDate" />
+		<result property="pdt_name" column="pdt_name" />
+	</resultMap>
+
+	<select id="selectAllGifts" resultMap="giftResult">
+		<![CDATA[
+			SELECT * FROM PP_GIFTS
+		]]>
+	</select>
+	
+	<select id="selectRDCode" resultType="int">
+	  <![CDATA[
+			SELECT gift_value FROM PP_GIFTS
+			WHERE gift_code=#{code}
+		]]>
+	</select>
+	
+	<select id="selectGiftListById" resultMap="giftResult" parameterType="String">
+	  <![CDATA[
+			SELECT *
+			FROM PP_GIFTS g  
+			INNER JOIN PP_PRODUCTS p
+			ON 
+			(p.pdt_code=g.gift_value)
+			WHERE owner_id = #{id}
+		]]>
+	</select>
+
+	<insert id="insertNewGiftToUser" parameterType="giftVO">
+		<![CDATA[
+			INSERT INTO PP_GIFTS
+			(gift_code, owner_id, gift_type, gift_value, is_opened, regDate)
+			VALUES
+			(GIFT_SEQ.NEXTVAL, #{content_id}, #{orgn_name}, 
+			 #{fileSize}, #{new_name}, #{data_path})
+		]]>
+	</insert>
+	
+	<update id="updateGiftUsed">
+		<![CDATA[
+			UPDATE PP_GIFTS
+			SET
+			is_opened='Y'
+			WHERE gift_code=#{gift_code}
+		]]>
+	</update>
+	
+	<update id="updateOwner" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE PP_GIFTS
+			SET
+			owner_id=#{owner_id}
+			WHERE gift_code=#{gift_code}
+		]]>
+	
+	</update>
+
+	<delete id="deleteGiftFromUser" parameterType="giftVO">
+		<![CDATA[
+			DELETE PP_GIFTS 
+			WHERE gift_code=#{gift_code}
+		]]>
+	</delete>
+
+</mapper>

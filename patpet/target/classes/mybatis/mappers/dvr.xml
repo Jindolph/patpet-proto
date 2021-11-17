@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.pp.common.mappers.DvrMapper">
+	<resultMap type="dvrVO" id="dvrResult">
+		<result property="dvr_code" column="dvr_code" />
+		<result property="rcvr_name" column="rcvr_name" />
+		<result property="mem_id" column="mem_id" />
+		<result property="address" column="address" />
+		<result property="zipcode" column="zipcode" />
+		<result property="addr_detail" column="addr_detail" />
+		<result property="requirement" column="requirement" />
+		<result property="phone_num" column="phone_num" />
+		<result property="dvr_type" column="dvr_type" />
+	</resultMap>
+
+	<select id="selectAllDvrInfo" resultMap="dvrResult">
+	    <![CDATA[
+			SELECT * FROM PP_DELIVERIES
+		]]>
+	</select>
+
+	<select id="selectDvrById" resultMap="dvrResult" parameterType="String">
+	    <![CDATA[
+			SELECT * FROM PP_DELIVERIES
+			WHERE mem_id=#{id}
+			ORDER BY dvr_type desc
+		]]>
+	</select>
+
+	<insert id="insertNewAddrInfo1" parameterType="java.util.Map">
+        <![CDATA[
+			INSERT INTO PP_DELIVERIES
+    		( dvr_code, rcvr_name, mem_id, address, zipcode, 
+    		  addr_detail, requirement, phone_num )
+			VALUES
+			( DVR_SEQ.nextval, #{mem_name}, #{mem_id}, #{address},
+		      #{zipcode}, #{addr_detail}, #{requirement}, #{phone_num} )
+        ]]>
+	</insert>
+
+	<insert id="insertNewAddrInfo2" parameterType="java.util.Map">
+        <![CDATA[
+			INSERT INTO PP_DELIVERIES
+    		( dvr_code, rcvr_name, mem_id, address, zipcode, 
+    		  addr_detail, requirement, phone_num, dvr_type )
+			VALUES
+			( DVR_SEQ.nextval, #{rcvr_name}, #{mem_id}, #{address},
+		      #{zipcode}, #{addr_detail}, #{requirement}, #{phone_num} ,#{dvr_type} )
+        ]]>
+	</insert>
+	
+	 <update id="updateDvrType" parameterType="java.util.Map">
+  <![CDATA[
+   UPDATE PP_DELIVERIES
+   SET dvr_type='N'
+   WHERE mem_id=#{mem_id}
+        ]]>
+ </update>
+	
+	<update id="updateAddressInfo" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE PP_DELIVERIES
+			SET 
+			rcvr_name=#{rcvr_name}, address=#{address}, zipcode=#{zipcode}, 
+			addr_detail=#{addr_detail}, dvr_type='Y', requirement=#{requirement}, phone_num=#{phone_num}
+			WHERE dvr_code=#{dvr_code}
+        ]]>
+	</update>
+
+	<delete id="deleteAddressInfo" parameterType="String">
+		<![CDATA[
+			DELETE PP_DELIVERIES
+			WHERE dvr_code=#{dvr_code}
+        ]]>
+	</delete>
+</mapper>
